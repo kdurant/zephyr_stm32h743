@@ -3,17 +3,21 @@
         {
             "name": "Zephyr STM32H743",
             "includePath": [
-                "${workspaceFolder}/**",
-                "${workspaceFolder}/app01_led/build/zephyr/include/generated/**",
-                "${workspaceFolder}/app01_led/build/zephyr/include/**"
+                "${workspaceFolder}/**"
             ],
-            "defines": [],
-            "compilerPath": "/usr/bin/arm-none-eabi-gcc",
-            "cStandard": "gnu11",
+            "defines": [
+                "__ZEPHYR__=1",
+                "KERNEL",
+                "STM32H743xx",
+                "CORE_CM7",
+                "USE_HAL_DRIVER",
+                "USE_FULL_LL_DRIVER"
+            ],
+            "compilerPath": "/home/wj/program/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc",
+            "cStandard": "c17",
             "cppStandard": "gnu++14",
             "intelliSenseMode": "linux-gcc-arm",
-            "compileCommands": "${workspaceFolder}/app01_led/build/compile_commands.json",
-            "configurationProvider": "ms-vscode.cmake-tools"
+            "compileCommands": "${workspaceFolder}/app01_led/build/compile_commands.json"
         }
     ],
     "version": 4
