@@ -1,0 +1,6 @@
+if BOARD_STM32H743_USER
+
+config GPIO
+	default y
+
+endif

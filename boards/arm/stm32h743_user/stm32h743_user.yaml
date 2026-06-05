@@ -1,0 +1,14 @@
+identifier: stm32h743_user
+name: STM32H743 User Board
+type: mcu
+arch: arm
+toolchain:
+  - zephyr
+  - gnuarmemb
+ram: 512
+flash: 2048
+supported:
+  - gpio
+  - serial
+  - watchdog
+vendor: wj
