@@ -3,7 +3,7 @@
     "C_Cpp.autocomplete": "default",
     "C_Cpp.enhancedColorization": "enabled",
     "C_Cpp.errorSquiggles": "enabled",
-    "C_Cpp.default.compileCommands": "${workspaceFolder}/app01_led/build/compile_commands.json",
+    "C_Cpp.default.compileCommands": "${workspaceFolder}/app02_key_interrupt/build/compile_commands.json",
     "files.associations": {
         "*.h": "c",
         "*.c": "c"
