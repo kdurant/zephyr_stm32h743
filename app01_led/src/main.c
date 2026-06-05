@@ -7,14 +7,19 @@ LOG_MODULE_REGISTER(app01_led, LOG_LEVEL_INF);
 
 #define LED0_NODE DT_ALIAS(led0)
 
-#if !DT_NODE_HAS_STATUS(LED0_NODE, okay)
-#error "No led0 alias found in device tree"
-#endif
-
+#if DT_NODE_HAS_STATUS(LED0_NODE, okay)
 static const struct gpio_dt_spec led0 = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
+#endif
 
 int main(void)
 {
+    #if !DT_NODE_HAS_STATUS(LED0_NODE, okay)
+    LOG_INF("No led0 alias in device tree. App is built, but LED blink is disabled.");
+    while (1) {
+        k_msleep(1000);
+    }
+    return 0;
+    #else
     int ret;
 
     if(!gpio_is_ready_dt(&led0))
@@ -43,4 +48,5 @@ int main(void)
     }
 
     return 0;
+	#endif
 }

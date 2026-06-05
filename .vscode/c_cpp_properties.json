@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        {
+            "name": "Zephyr STM32H743",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/app01_led/build/zephyr/include/generated/**",
+                "${workspaceFolder}/app01_led/build/zephyr/include/**"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/arm-none-eabi-gcc",
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++14",
+            "intelliSenseMode": "linux-gcc-arm",
+            "compileCommands": "${workspaceFolder}/app01_led/build/compile_commands.json",
+            "configurationProvider": "ms-vscode.cmake-tools"
+        }
+    ],
+    "version": 4
+}

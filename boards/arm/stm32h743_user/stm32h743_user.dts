@@ -1,6 +1,7 @@
 /dts-v1/;
 #include <st/h7/stm32h743Xi.dtsi>
 #include <st/h7/stm32h743iitx-pinctrl.dtsi>
+#include <zephyr/dt-bindings/input/input-event-codes.h>
 
 / {
 	model = "STM32H743 User Board";
@@ -20,10 +21,33 @@
 			gpios = <&gpiob 3 GPIO_ACTIVE_LOW>;
 			label = "LED0_PB3";
 		};
+		led1: led_1 {
+			gpios = <&gpiob 4 GPIO_ACTIVE_LOW>;
+			label = "LED1_PB4";
+		};
+	};
+
+	gpio_keys {
+		compatible = "gpio-keys";
+
+		button0: button_0 {
+			label = "KEY0_PB3";
+			gpios = <&gpiob 3 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+			zephyr,code = <INPUT_KEY_0>;
+		};
+
+		button1: button_1 {
+			label = "KEY1_PB4";
+			gpios = <&gpiob 4 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+			zephyr,code = <INPUT_KEY_1>;
+		};
 	};
 
 	aliases {
 		led0 = &led0;
+		led1 = &led1;
+		sw0 = &button0;
+		sw1 = &button1;
 		watchdog0 = &iwdg;
 	};
 };
