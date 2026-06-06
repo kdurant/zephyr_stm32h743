@@ -7,5 +7,6 @@
     "files.associations": {
         "*.h": "c",
         "*.c": "c"
-    }
+    },
+    "terminal.integrated.stickyScroll.enabled": false
 }
