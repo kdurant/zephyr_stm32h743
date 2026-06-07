@@ -3,7 +3,24 @@
         {
             "name": "Zephyr STM32H743",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/build/zephyr/include/generated/zephyr",
+                "${workspaceFolder}/build/zephyr/include/generated",
+                "/home/wj/program/zephyrproject/zephyr/include",
+                "/home/wj/program/zephyrproject/zephyr/kernel/include",
+                "/home/wj/program/zephyrproject/zephyr/arch/arm/include",
+                "/home/wj/program/zephyrproject/zephyr/drivers",
+                "/home/wj/program/zephyrproject/zephyr/soc/st/stm32",
+                "/home/wj/program/zephyrproject/zephyr/soc/st/stm32/stm32h7x",
+                "/home/wj/program/zephyrproject/zephyr/soc/st/stm32/common",
+                "/home/wj/program/zephyrproject/zephyr/lib/libc/picolibc/include",
+                "/home/wj/program/zephyrproject/zephyr/lib/libc/common/include",
+                "/home/wj/program/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/arm-zephyr-eabi/include",
+                "/home/wj/program/zephyrproject/modules/hal/stm32/stm32cube/stm32h7xx/soc",
+                "/home/wj/program/zephyrproject/modules/hal/stm32/stm32cube/stm32h7xx/drivers/include",
+                "/home/wj/program/zephyrproject/modules/hal/stm32/stm32cube/common_ll/include",
+                "/home/wj/program/zephyrproject/modules/hal/cmsis_6/CMSIS/Core/Include",
+                "/home/wj/program/zephyrproject/modules/hal/cmsis_6"
             ],
             "defines": [
                 "__ZEPHYR__=1",
@@ -11,13 +28,33 @@
                 "STM32H743xx",
                 "CORE_CM7",
                 "USE_HAL_DRIVER",
-                "USE_FULL_LL_DRIVER"
+                "USE_FULL_LL_DRIVER",
+                "HSE_VALUE=25000000",
+                "K_HEAP_MEM_POOL_SIZE=0",
+                "PICOLIBC_LONG_LONG_PRINTF_SCANF",
+                "_POSIX_THREAD_SAFE_FUNCTIONS=200809L",
+                "__LINUX_ERRNO_EXTENSIONS__",
+                "__PROGRAM_START"
             ],
             "compilerPath": "/home/wj/program/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc",
             "cStandard": "c17",
             "cppStandard": "gnu++14",
             "intelliSenseMode": "linux-gcc-arm",
-            "compileCommands": "${workspaceFolder}/app01_led/build/compile_commands.json"
+            "compilerArgs": [
+                "-mcpu=cortex-m7",
+                "-mthumb",
+                "-mabi=aapcs"
+            ],
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/**",
+                    "${workspaceFolder}/build/zephyr/include/generated/zephyr",
+                    "/home/wj/program/zephyrproject/zephyr/include",
+                    "/home/wj/program/zephyrproject/zephyr/drivers",
+                    "/home/wj/program/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/arm-zephyr-eabi/include"
+                ],
+                "limitSymbolsToIncludedHeaders": false
+            }
         }
     ],
     "version": 4
