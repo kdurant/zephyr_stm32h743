@@ -17,7 +17,6 @@ int main(void)
 {
     int ret;
 
-    printf("Starting app01_led\n");
     if(!gpio_is_ready_dt(&led0))
     {
         LOG_ERR("LED0 GPIO device not ready");
@@ -33,10 +32,14 @@ int main(void)
 
     LOG_INF("Start blinking LED0 on PB3 (IO=0 on, IO=1 off)");
 
+    int count = 0;
     while(1)
     {
-        /* Force raw physical level: 0 = LED on, 1 = LED off. */
         gpio_pin_set_raw(led0.port, led0.pin, 0);
+
+        count++;
+        printk("[%d] Version : %s (uptime=%u ms)\n",
+               count, APP_VERSION, k_uptime_get_32());
         k_msleep(500);
 
         gpio_pin_set_raw(led0.port, led0.pin, 1);
