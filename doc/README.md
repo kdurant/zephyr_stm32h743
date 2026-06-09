@@ -3,6 +3,15 @@
 sudo apt-get install libusb-1.0-0-dev
 sudo apt-get install libhidapi-dev
 
+
+sudo apt-get install openocd
+
+# 配置 udev 规则（解决权限问题）
+echo 'SUBSYSTEM=="usb", ATTR{idVendor}=="1a86", ATTR{idProduct}=="8012", MODE="0666", GROUP="plugdev"' | sudo tee /etc/udev/rules.d/99-wch-link.rules
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+
+# 测试硬件是否正常
 # 启动 OpenOCD 调试服务器，并建立 PC 与 STM32H7 系列目标芯片之间的通信链路
 # -f interface/cmsis-dap.cfg, 告诉 OpenOCD 使用 CMSIS-DAP 协议的调试适配器
 # -f target/stm32h7x.cfg, 告诉 OpenOCD 目标芯片的型号是 STM32H7 系列
