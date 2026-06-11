@@ -1,0 +1,8 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+
+/* 为 USART1 添加 DMA 通道 */
+&usart1 {
+	dmas = <&dmamux1 0 38 STM32_DMA_PERIPH_TX>,
+	       <&dmamux1 0 37 STM32_DMA_PERIPH_RX>;
+	dma-names = "tx", "rx";
+};
