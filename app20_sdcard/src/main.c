@@ -4,6 +4,7 @@
 #include <zephyr/fs/fs.h>
 #include <zephyr/storage/disk_access.h>
 #include <zephyr/drivers/disk.h>
+#include <ff.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -278,8 +279,21 @@ int main(void)
         LOG_INF("  Total size: %u KB", (sector_count / 1024) * sector_size);
     }
 
-    /* 等待文件系统挂载 */
-    k_sleep(K_MSEC(500));
+    /* 挂载 FAT 文件系统 */
+    LOG_INF("Mounting FAT filesystem...");
+    static FATFS fat_fs;
+    static struct fs_mount_t fat_mount = {
+        .type = FS_FATFS,
+        .mnt_point = "/SD:",
+        .fs_data = &fat_fs,
+    };
+    ret = fs_mount(&fat_mount);
+    if(ret < 0)
+    {
+        LOG_ERR("Failed to mount FAT filesystem: %d", ret);
+        return -1;
+    }
+    LOG_INF("FAT filesystem mounted at /SD:");
 
     /* 步骤 2: 打印文件系统统计信息 */
     LOG_INF("\nStep 2: Getting filesystem statistics...");
