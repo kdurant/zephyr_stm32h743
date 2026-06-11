@@ -1,5 +1,5 @@
 #include <zephyr/kernel.h>
-#include <zephyr/net/socket.h>
+#include <zephyr/posix/sys/socket.h>
 #include <zephyr/posix/unistd.h>
 #include <zephyr/console/console.h>
 #include <stdio.h>
