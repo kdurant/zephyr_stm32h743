@@ -12,6 +12,7 @@
 		zephyr,shell-uart = &usart1;
 		zephyr,sram = &sram0;
 		zephyr,flash = &flash0;
+		zephyr,flash-controller = &qspi_nor_flash;
 	};
 
 	leds {
@@ -116,10 +117,30 @@
 
 &sdmmc1 {
 	pinctrl-0 = <&sdmmc1_d0_pc8 &sdmmc1_d1_pc9 &sdmmc1_d2_pc10
-		     &sdmmc1_d3_pc11 &sdmmc1_ck_pc12 &sdmmc1_cmd_pd2>;
+	&sdmmc1_d3_pc11 &sdmmc1_ck_pc12 &sdmmc1_cmd_pd2>;
 	pinctrl-names = "default";
 	bus-width = <4>;
 	cd-gpios = <&gpiod 3 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
 	disk-name = "SD";
 	status = "okay";
+};
+
+&quadspi {
+	pinctrl-0 = <&quadspi_clk_pb2 &quadspi_bk1_ncs_pb10
+	&quadspi_bk1_io0_pd11 &quadspi_bk1_io1_pd12
+	&quadspi_bk1_io2_pe2 &quadspi_bk1_io3_pd13>;
+	pinctrl-names = "default";
+	flash-id = <1>;
+	status = "okay";
+
+	qspi_nor_flash: qspi-nor-flash@0 {
+		compatible = "st,stm32-qspi-nor";
+		reg = <0>;
+		size = <DT_SIZE_M(16)>;
+		qspi-max-frequency = <40000000>;
+		cs-high-time = <2>;
+		spi-bus-width = <4>;
+		writeoc = "PP_1_1_4";
+		status = "okay";
+	};
 };
