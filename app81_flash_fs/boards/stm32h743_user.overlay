@@ -1,0 +1,19 @@
+/*
+ * STM32H743: use last 256KB of internal flash for LittleFS.
+ * Flash base: 0x08000000, total 2MB.
+ * Last 256KB offset: 0x1C0000, size: 0x40000.
+ */
+
+&flash0 {
+	partitions {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		storage_partition: partition@1c0000 {
+			compatible = "fixed-partitions";
+			label = "storage";
+			reg = <0x1c0000 DT_SIZE_K(256)>;
+		};
+	};
+};
