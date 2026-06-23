@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OTA 固件升级工具</title>
+</head>
+
+<body>
+    <div id="root"></div>
+    <noscript>
+        <div style="color:#ef5350;padding:40px;font-family:monospace;">
+            ⚠ 需要启用 JavaScript
+        </div>
+    </noscript>
+    <script type="module">
+        import("/src/main.tsx").catch((error) => {
+            const root = document.getElementById("root");
+            if (root) {
+                root.innerHTML = `<pre style="white-space:pre-wrap;color:#b00020;padding:16px;font-family:monospace;">${String(error?.stack || error?.message || error)}</pre>`;
+            }
+            console.error("[boot] module import failed", error);
+        });
+    </script>
+</body>
+
+</html>
