@@ -1,61 +1,38 @@
-/* SPDX-License-Identifier: Apache-2.0 */
-/* OTA command handler — dispatches each command to the appropriate logic */
-
 #ifndef OTA_HANDLER_H
 #define OTA_HANDLER_H
 
-#include "frame.h"
+#include <stdint.h>
+#include <stdbool.h>
 
-/* ── OTA 升级阶段 ── */
-typedef enum
-{
-    OTA_STAGE_IDLE      = 0x00,
-    OTA_STAGE_ERASING   = 0x01,
-    OTA_STAGE_RECEIVING = 0x02,
-    OTA_STAGE_VERIFYING = 0x03,
-    OTA_STAGE_COMPLETE  = 0x04,
-    OTA_STAGE_ERROR     = 0xFF,
-} ota_stage_t;
+typedef struct {
+    uint8_t  status;
+    uint8_t  error_code;
+    uint32_t received_size;
+    uint32_t firmware_size;
+    uint32_t firmware_crc;
+    uint32_t calculated_crc;
+    uint32_t current_offset;
+    uint16_t max_packet_size;
+    uint8_t  boot_flag;
+    uint32_t slot0_offset;
+    uint32_t slot1_offset;
+    uint32_t slot_size;
+    bool     in_progress;
+} ota_state_t;
 
-/* ── 设备状态 ── */
-typedef enum
-{
-    DEV_STATUS_IDLE      = 0x00,
-    DEV_STATUS_UPGRADING = 0x01,
-    DEV_STATUS_READY     = 0x02,
-} dev_status_t;
+extern ota_state_t ota_state;
 
-/* ── OTA 上下文 ── */
-typedef struct
-{
-    dev_status_t dev_status;
-    ota_stage_t  stage;
-    uint32_t     fw_total_size;
-    uint32_t     fw_crc32;
-    uint32_t     fw_version; /* packed: major|minor|rev_hi|rev_lo */
-    uint16_t     max_packet_size;
-    uint32_t     bytes_received;
-    uint8_t      error_code;
-    bool         cancelled;
-} ota_ctx_t;
+void ota_handler_init(void);
 
-/* ── 设备信息 ── */
-typedef struct
-{
-    char     mcu_model[16];
-    uint8_t  fw_ver[4]; /* major, minor, rev_hi, rev_lo */
-    uint32_t flash_total_size;
-    uint16_t flash_page_size;
-    uint32_t flash_used_size;
-    uint32_t fw_start_addr;
-} device_info_t;
+void ota_cmd_handshake(uint16_t seq, const uint8_t *data, uint16_t len);
+void ota_cmd_get_dev_info(uint16_t seq, const uint8_t *data, uint16_t len);
+void ota_cmd_start_upgrade(uint16_t seq, const uint8_t *data, uint16_t len);
+void ota_cmd_transfer_data(uint16_t seq, const uint8_t *data, uint16_t len);
+void ota_cmd_transfer_done(uint16_t seq, const uint8_t *data, uint16_t len);
+void ota_cmd_verify_firmware(uint16_t seq, const uint8_t *data, uint16_t len);
+void ota_cmd_reset_run(uint16_t seq, const uint8_t *data, uint16_t len);
+void ota_cmd_cancel_upgrade(uint16_t seq, const uint8_t *data, uint16_t len);
+void ota_cmd_query_status(uint16_t seq, const uint8_t *data, uint16_t len);
+void ota_cmd_set_boot_flag(uint16_t seq, const uint8_t *data, uint16_t len);
 
-/* ── API ── */
-void ota_ctx_init(ota_ctx_t* ctx);
-void ota_handler_init(const device_info_t* info);
-
-/* 处理收到的请求帧，若需要响应则填充 resp */
-/* 返回 true 表示需要发送 resp */
-bool ota_handle_frame(const frame_t* req, frame_t* resp);
-
-#endif /* OTA_HANDLER_H */
+#endif

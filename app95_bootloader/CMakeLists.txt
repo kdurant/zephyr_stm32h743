@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.20.0)
 
+# Allow building custom out-of-tree boards stored in ../boards.
 list(APPEND BOARD_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
+# 获取应用自身的 Git 信息，格式: YYYY-MM-DD_hash
 execute_process(
   COMMAND git -C ${CMAKE_CURRENT_SOURCE_DIR} describe --always --dirty --tags
   OUTPUT_VARIABLE APP_GIT_REV
@@ -23,15 +25,12 @@ else()
   set(APP_VERSION "unknown")
 endif()
 
-set(DTS_EXTRA_OVERLAY_FILE boards/stm32h743_user.overlay)
-
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
-project(app90_ota)
+project(app95_bootloader)
 
-target_compile_definitions(app PRIVATE APP_VERSION_STRING="${APP_VERSION}")
+target_sources(app PRIVATE src/main.c)
 
-target_sources(app PRIVATE
-    src/main.c
-    src/ota_protocol.c
-    src/ota_handler.c
+# 以宏形式传入 C 代码
+target_compile_definitions(app PRIVATE
+  APP_VERSION="${APP_VERSION}"
 )

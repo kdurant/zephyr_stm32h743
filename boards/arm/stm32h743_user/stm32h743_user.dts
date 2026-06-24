@@ -139,7 +139,7 @@
 	qspi_nor_flash: qspi-nor-flash@0 {
 		compatible = "st,stm32-qspi-nor";
 		reg = <0>;
-		size = <DT_SIZE_M(16)>;
+		size = <0x8000000>; /* 16MB = 128Mb, binding uses bits */
 		qspi-max-frequency = <40000000>;
 		cs-high-time = <2>;
 		spi-bus-width = <4>;
