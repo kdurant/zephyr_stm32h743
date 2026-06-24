@@ -65,7 +65,10 @@ function App() {
                         onBaudRateChange={serial.setBaudRate}
                         onRefresh={serial.refreshPorts}
                         onConnect={serial.connect}
-                        onDisconnect={serial.disconnect}
+                        onDisconnect={() => {
+                            serial.disconnect();
+                            ota.resetState();
+                        }}
                     />
                     <FirmwareSelector
                         onFirmwareSelected={handleFirmwareSelected}

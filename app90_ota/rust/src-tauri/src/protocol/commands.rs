@@ -9,6 +9,7 @@ pub const CMD_RESET_RUN: u16 = 0x0007;
 pub const CMD_CANCEL_UPGRADE: u16 = 0x0008;
 pub const CMD_QUERY_STATUS: u16 = 0x0009;
 pub const CMD_SET_BOOT_FLAG: u16 = 0x000A;
+pub const CMD_GET_LOG: u16 = 0x000B;
 
 use crate::protocol::frame::Frame;
 
@@ -58,12 +59,7 @@ pub fn parse_device_info(frame: &Frame) -> Option<DeviceInfo> {
     let mcu_model = String::from_utf8_lossy(&d[0..16])
         .trim_end_matches('\0')
         .to_string();
-    let fw_version = format!(
-        "V{}.{}.{}",
-        d[16],
-        d[17],
-        u16::from_le_bytes([d[18], d[19]])
-    );
+    let fw_version = format!("V{}.{}.{}", d[16], d[17], d[18]);
     let flash_total_size = u32::from_le_bytes([d[20], d[21], d[22], d[23]]);
     let flash_page_size = u16::from_le_bytes([d[24], d[25]]);
     let flash_used_size = u32::from_le_bytes([d[26], d[27], d[28], d[29]]);
@@ -254,4 +250,25 @@ pub fn parse_query_status(frame: &Frame) -> Option<UpgradeStatus> {
 /// flag: 0x00 = rollback to old firmware, 0x01 = mark new firmware as available
 pub fn build_set_boot_flag(flag: u8) -> Result<Frame, crate::protocol::frame::FrameError> {
     Frame::new(CMD_SET_BOOT_FLAG, vec![flag])
+}
+
+// ═══════════════════════════════════════════════
+// 0x000B — Get Log
+// ═══════════════════════════════════════════════
+
+pub fn build_get_log() -> Result<Frame, crate::protocol::frame::FrameError> {
+    Frame::new(CMD_GET_LOG, vec![])
+}
+
+/// Parse get-log response. Returns the raw log text string.
+pub fn parse_get_log(frame: &Frame) -> Option<String> {
+    if frame.data.is_empty() {
+        return None;
+    }
+    let text = String::from_utf8_lossy(&frame.data).to_string();
+    if text.trim().is_empty() {
+        None
+    } else {
+        Some(text)
+    }
 }

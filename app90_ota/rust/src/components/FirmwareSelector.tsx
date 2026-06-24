@@ -15,7 +15,10 @@ export function FirmwareSelector({ onFirmwareSelected, firmwarePath, firmwareNam
             const { open } = await import("@tauri-apps/plugin-dialog");
             const selected = await open({
                 multiple: false,
-                filters: [{ name: "固件文件", extensions: ["bin", "hex", "fw", "ota"] }],
+                filters: [
+                    { name: "固件文件", extensions: ["bin", "BIN"] },
+                    { name: "所有文件", extensions: ["*"] },
+                ],
             });
             if (selected) {
                 const path = typeof selected === "string" ? selected : selected;
@@ -36,7 +39,12 @@ export function FirmwareSelector({ onFirmwareSelected, firmwarePath, firmwareNam
             {firmwareName && (
                 <div className="firmware-info">
                     <p className="filename">{firmwareName}</p>
-                    <p className="muted" style={{ fontSize: "0.8em", wordBreak: "break-all" }}>{firmwarePath}</p>
+                    <p className="muted" style={{ fontSize: "0.75em" }}
+                        title={firmwarePath}>
+                        {firmwarePath.length > 50
+                            ? firmwarePath.slice(0, 25) + "..." + firmwarePath.slice(-22)
+                            : firmwarePath}
+                    </p>
                 </div>
             )}
             {error && <p className="error-text">{error}</p>}

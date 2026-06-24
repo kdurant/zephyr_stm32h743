@@ -114,6 +114,7 @@ export function useOta() {
             addLog("info", "获取设备信息...");
             const invoke = await getInvoke();
             await invoke("get_device_info");
+            addLog("success", "获取设备信息成功");
         } catch (e) {
             addLog("error", `获取设备信息失败: ${e}`);
             throw e;
@@ -167,6 +168,15 @@ export function useOta() {
 
     const clearLogs = useCallback(() => setLogs([]), []);
 
+    const resetState = useCallback(() => {
+        setStage("Idle");
+        setProgress({ sent: 0, total: 0, percentage: 0 });
+        setMessage("");
+        setDeviceInfo(null);
+        setLogs([]);
+        setError(null);
+    }, []);
+
     return {
         stage,
         progress,
@@ -184,5 +194,6 @@ export function useOta() {
         verifyFirmware,
         resetDevice,
         clearLogs,
+        resetState,
     };
 }
