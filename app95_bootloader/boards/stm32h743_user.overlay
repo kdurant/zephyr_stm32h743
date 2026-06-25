@@ -1,8 +1,9 @@
 /*
  * MCUboot + Dual Slot (A/B) layout on internal flash:
  *   0x00000000 - 0x0001FFFF  MCUboot      (128KB)
- *   0x00020000 - 0x0010FFFF  Slot0 image  (896KB)
- *   0x00110000 - 0x001FFFFF  Slot1 image  (896KB)
+ *   0x00020000 - 0x000FFFFF  Slot0 image  (896KB)
+ *   0x00100000 - 0x001DFFFF  Slot1 image  (896KB)
+ *   0x001E0000 - 0x001FFFFF  User Data    (128KB)
  */
 
 / {
@@ -26,12 +27,17 @@
 
 		slot0_partition: partition@20000 {
 			label = "image-0";
-			reg = <0x00020000 0xF0000>;
+			reg = <0x00020000 0xE0000>;
 		};
 
-		slot1_partition: partition@110000 {
+		slot1_partition: partition@100000 {
 			label = "image-1";
-			reg = <0x00110000 0xF0000>;
+			reg = <0x00100000 0xE0000>;
+		};
+
+		user_data_partition: partition@1E0000 {
+			label = "user-data";
+			reg = <0x001E0000 0x20000>;
 		};
 	};
 };

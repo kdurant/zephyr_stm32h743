@@ -6,14 +6,10 @@ STM32H743 双镜像启动示例：MCUboot bootloader + 应用镜像（LED 闪烁
 
 ```
 0x08000000 - 0x0801FFFF (128KB): boot_partition — MCUboot bootloader
-0x08020000 - 0x0810FFFF (960KB): slot0_partition — 主应用槽
-0x08110000 - 0x081FFFFF (960KB): slot1_partition — 副应用槽 (OTA)
+0x08020000 - 0x080FFFFF (896KB): slot0_partition — 主应用槽
+0x08100000 - 0x081DFFFF (896KB): slot1_partition — 副应用槽 (OTA)
+0x081E0000 - 0x081FFFFF (128KB): user_data_partition — 用户数据
 ```
-
-## LED 定义
-
-- `led0` — PB3，IO=0 亮 / IO=1 灭
-- `led1` — PB4，IO=0 亮 / IO=1 灭
 
 ## 编译
 
@@ -37,6 +33,46 @@ west flash -d build/mcuboot
 
 ```bash
 west flash -d build/app95_bootloader
+```
+
+### west flash 如何知道烧录到哪个地址？
+
+`west flash` 通过**编译产物中的 devicetree 信息**确定烧录地址。流程如下：
+
+1. **编译阶段**：Zephyr 的构建系统读取 devicetree overlay 文件，将分区定义写入编译产物
+2. **烧录阶段**：`west flash` 读取编译目录下的 `.config` 和 `zephyr.rane`（或 `devicetree_generated.h`），获取目标分区的起始地址和大小
+
+关键在于 devicetree overlay 中的 `zephyr,code-partition` 选择节点：
+
+**MCUboot (build/mcuboot)**:
+```dts
+/* mcuboot/boards/stm32h743_user.overlay */
+chosen {
+    zephyr,code-partition = &boot_partition;  // ← 指向 boot_partition
+};
+```
+→ `west flash -d build/mcuboot` 烧录到 `boot_partition`（0x08000000）
+
+**应用程序 (build/app95_bootloader)**:
+```dts
+/* boards/stm32h743_user.overlay */
+chosen {
+    zephyr,code-partition = &slot0_partition;  // ← 指向 slot0_partition
+};
+```
+→ `west flash -d build/app95_bootloader` 烧录到 `slot0_partition`（0x08020000）
+
+```
+west flash 读取的烧录地址来源:
+├── build/mcuboot/
+│   ├── .config                    # 包含 CONFIG_FLASH_BASE_ADDRESS=0x08000000
+│   └── zephyr/
+│       └── devicetree_generated.h # 包含 boot_partition 的地址定义
+│
+└── build/app95_bootloader/
+    ├── .config                    # 包含 CONFIG_FLASH_BASE_ADDRESS=0x08000000
+    └── zephyr/
+        └── devicetree_generated.h # 包含 slot0_partition 的地址定义
 ```
 
 ## 启动原理说明
@@ -66,14 +102,15 @@ Cortex-M7 的内存映射是固定的：
 - 内部 Flash 物理地址：`0x08000000` ~ `0x081FFFFF`（STM32H743XI = 2MB）
 - 上电时根据 BOOT 引脚，Flash 被别名映射到 `0x00000000` 起始的代码区
 
-而 MCUboot 的分区方案（128KB boot + 960KB slot0 + 960KB slot1）是**在 device tree overlay 中定义的软件约定**：
+而 MCUboot 的分区方案（128KB boot + 896KB slot0 + 896KB slot1 + 128KB user data）是**在 device tree overlay 中定义的软件约定**：
 
 ```dts
 &flash0 {
     partitions {
         boot_partition: partition@0    { reg = <0x00000000 0x20000>; };  // 128KB
-        slot0_partition: partition@20000 { reg = <0x00020000 0xF0000>; }; // 960KB
-        slot1_partition: partition@110000 { reg = <0x00110000 0xF0000>; }; // 960KB
+        slot0_partition: partition@20000 { reg = <0x00020000 0xE0000>; }; // 896KB
+        slot1_partition: partition@100000 { reg = <0x00100000 0xE0000>; }; // 896KB
+        user_data_partition: partition@1E0000 { reg = <0x001E0000 0x20000>; }; // 128KB
     };
 };
 ```
@@ -150,7 +187,7 @@ flowchart LR
 ```mermaid
 flowchart TB
     A["1. 运行中的应用通过无线(Wi-Fi/蓝牙)或串口下载新固件<br/>新固件以数据流的形式到达"] --> B
-    B["2. 应用将新固件写入 slot1(副应用槽)<br/>物理地址: 0x08110000 ~ 0x081FFFFF(960KB)<br/><br/>写入完成后，设置 image 状态为 pending<br/>调用 NVIC_SystemReset() 触发系统复位"] --> C
+    B["2. 应用将新固件写入 slot1(副应用槽)<br/>物理地址: 0x08100000 ~ 0x081DFFFF(896KB)<br/><br/>写入完成后，设置 image 状态为 pending<br/>调用 NVIC_SystemReset() 触发系统复位"] --> C
     C["3. CPU 复位，从 0x08000000 启动 MCUboot<br/>MCUboot 读取 slot0 和 slot1 的 image header<br/>发现 slot1 标记为 pending(待升级)"] --> D
     D["MCUboot 执行 swap 策略"] --> E{选择哪种 swap?}
     E --> F["swap-scratch(默认)<br/>需要 scratch 分区<br/><br/>slot0 旧固件 → scratch<br/>slot1 新固件 → slot0<br/>scratch 旧固件 → slot1"]
@@ -198,12 +235,3 @@ sys_reboot(SYS_REBOOT_COLD);
 boot_set_confirmed();
 ```
 
-> **硬件支持**：完整的 OTA 方案还需要实现物理层传输（Wi-Fi 模块、以太网、蓝牙等）和可靠的数据流协议（如 HTTP 分块下载、XMODEM、YMODEM），这些在 `app90_ota` 中有参考实现。
-
-## 构建产物
-
-| 文件                                              | 说明               | 烧录地址             |
-| ------------------------------------------------- | ------------------ | -------------------- |
-| `build/mcuboot/zephyr/zephyr.bin`                 | MCUboot bootloader | `0x08000000`         |
-| `build/app95_bootloader/zephyr/zephyr.signed.bin` | 签名应用镜像       | `0x08020000` (slot0) |
-```
